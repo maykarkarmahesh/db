@@ -26,5 +26,13 @@ public class Validation {
             throw new InvalidFieldException("shopAddress");
         }
 
+        if(StringUtils.isEmpty(shopAddress.getNumber())){
+            throw new InvalidFieldException("number");
+        }
+
+        if(shopAddress.getPostCode() == null || shopAddress.getPostCode() <= 0){
+            throw new InvalidFieldException("postCode");
+        }
+
     }
 }

@@ -1,5 +1,7 @@
 package com.db.wrappers;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -7,27 +9,29 @@ import lombok.Data;
  * Created by mmaykarkar on 12/02/17.
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShopAddressWrapper {
 
     @JsonProperty(value = "number")
-    private int number;
+    private String number;
 
     @JsonProperty(value = "postCode")
-    private int postCode;
+    private Integer postCode;
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
-    public int getPostCode() {
+    public Integer getPostCode() {
         return postCode;
     }
 
-    public void setPostCode(int postCode) {
+    public void setPostCode(Integer postCode) {
         this.postCode = postCode;
     }
 }

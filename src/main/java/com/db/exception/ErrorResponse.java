@@ -1,8 +1,13 @@
 package com.db.exception;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Created by mmaykarkar on 13/02/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorResponse {
 
     private int errorCode;

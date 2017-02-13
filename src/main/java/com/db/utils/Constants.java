@@ -12,4 +12,5 @@ public class Constants {
     public static final String METHOD_TYPE = "GET";
     public static final String HEADER_KEY = "Accept";
     public static final String HEADER_VALUE = "application/json";
+    public static final String GEO_CODE_API_STATUS = "OK";
 }
