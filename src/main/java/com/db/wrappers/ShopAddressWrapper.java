@@ -15,4 +15,19 @@ public class ShopAddressWrapper {
     @JsonProperty(value = "postCode")
     private int postCode;
 
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(int postCode) {
+        this.postCode = postCode;
+    }
 }

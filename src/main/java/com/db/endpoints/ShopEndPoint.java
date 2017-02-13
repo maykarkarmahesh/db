@@ -1,9 +1,13 @@
 package com.db.endpoints;
 
+import com.db.service.ShopService;
 import com.db.wrappers.ShopWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -14,9 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/shop")
 public class ShopEndPoint {
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper){
+    @Autowired
+    private ShopService shopService;
 
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper) throws IOException {
+
+        shopService.addShop(shopWrapper);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
