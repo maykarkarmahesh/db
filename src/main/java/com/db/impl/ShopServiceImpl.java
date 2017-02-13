@@ -74,7 +74,7 @@ public class ShopServiceImpl implements ShopService{
         validatelatlng(latitude.trim(), longitude.trim());
 
         // latlng field value to be passed to GEOCODE API
-        String latLng = new StringBuffer().append(latitude).append(Constants.COMMA_SEPARATOR).append(longitude).toString();
+        String latLng = new StringBuilder().append(latitude).append(Constants.COMMA_SEPARATOR).append(longitude).toString();
 
         // Google API handling for getting shop details based on customer's lat and lng
         Result result = geoCodeService.getGeoCodeResponse(Constants.LAT_LNG_QUERY_PARAM,latLng);
@@ -107,7 +107,7 @@ public class ShopServiceImpl implements ShopService{
      * @return
      */
     public String getAddressValue(ShopWrapper shopWrapper) {
-        StringBuffer address = new StringBuffer();
+        StringBuilder address = new StringBuilder();
         return  address.append(shopWrapper.getShopAddress().getNumber().trim())
                        .append(shopWrapper.getShopName().trim())
                        .append(shopWrapper.getShopAddress().getPostCode()).toString();
