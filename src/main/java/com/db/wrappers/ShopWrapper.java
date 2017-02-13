@@ -8,7 +8,6 @@ import lombok.Data;
 /**
  * Created by mmaykarkar on 12/02/17.
  */
-@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShopWrapper {

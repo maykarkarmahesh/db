@@ -21,13 +21,28 @@ public class ShopEndPoint {
     @Autowired
     private ShopService shopService;
 
+    /**
+     * Service to add shop with necessary details
+     * @param shopWrapper
+     * @return 201 if created successfully OR respective error message
+     */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper){
-        if(shopService.addShop(shopWrapper)) {
-            return new ResponseEntity(HttpStatus.CREATED);
-        }else{
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper) {
+        shopService.addShop(shopWrapper);
+        return new ResponseEntity(HttpStatus.CREATED);
+
+    }
+
+    /**
+     * Service to return shop details based on Customer's lnglat
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    @RequestMapping(value = "/lat/{latitude}/lng/{longitude}", method = RequestMethod.GET)
+    public ResponseEntity getShopDetails(@PathVariable String latitude, @PathVariable String longitude) {
+        shopService.getShopDetails(latitude, longitude);
+        return null;
     }
 
 }

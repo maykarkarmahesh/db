@@ -30,7 +30,7 @@ public class GenericExceptionHandler {
     @ExceptionHandler(NoRecordsFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoRecordFoundException(HttpServletRequest req, NoRecordsFoundException ex) {
         ErrorResponse error = new ErrorResponse();
-        error.setErrorCode(HttpStatus.NO_CONTENT.value());
+        error.setErrorCode(HttpStatus.NOT_FOUND.value());
         error.setMessage("No records found.");
         return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
     }

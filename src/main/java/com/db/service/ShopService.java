@@ -7,5 +7,7 @@ import com.db.wrappers.ShopWrapper;
  */
 public interface ShopService {
 
-    public boolean addShop(ShopWrapper shopWrapper);
+    public void addShop(ShopWrapper shopWrapper);
+
+    public void getShopDetails(String latitude, String longitude);
 }

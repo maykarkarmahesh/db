@@ -2,23 +2,20 @@ package com.db.impl;
 
 import com.db.entity.Shop;
 import com.db.entity.ShopAddress;
+import com.db.exception.InvalidFieldException;
 import com.db.exception.NoRecordsFoundException;
+import com.db.service.GeoCodeService;
 import com.db.service.ShopService;
 import com.db.utils.Constants;
 import com.db.utils.Result;
 import com.db.utils.Results;
-import com.db.utils.Validation;
+import com.db.wrappers.ShopAddressWrapper;
 import com.db.wrappers.ShopWrapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.apache.http.protocol.HTTP;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.Response;
-
+import java.util.Objects;
 
 import static com.db.app.Application.SHOPS;
 
@@ -30,21 +27,32 @@ import static com.db.app.Application.SHOPS;
 public class ShopServiceImpl implements ShopService{
 
     @Autowired
-    private Validation validationUtil;
+    private GeoCodeService geoCodeService;
 
+    /**
+     * Mockito constructor
+     */
+    public ShopServiceImpl() {
+    }
+
+    /**
+     * Business layer implementation for adding shop
+     * @param shopWrapper
+     */
     @Override
-    public boolean addShop(ShopWrapper shopWrapper) {
+    public void addShop(ShopWrapper shopWrapper) {
 
-        // sanity checking validation
-        validationUtil.validateShopRequest(shopWrapper);
+        // sanity check validation
+        validateShopRequest(shopWrapper);
+
+        // address field value to be passed to GEOCODE API
+        String addressValue = getAddressValue(shopWrapper);
 
         // Google API handling for getting longitude and latitude
-        Result result = getGeoCodeResponse(shopWrapper);
+        Result result = geoCodeService.getGeoCodeResponse(Constants.ADDRESS_QUERY_PARAM,addressValue);
 
         // If status is other than OK then return false so as to indicate NO records/content found
-        if (!result.getStatus().equals(Constants.GEO_CODE_API_STATUS)) {
-            throw  new NoRecordsFoundException();
-        }
+        validateResult(result);
 
         // processing response from Google GEOCODE API
         for (Results results : result.getResults()) {
@@ -52,9 +60,34 @@ public class ShopServiceImpl implements ShopService{
             break;
         }
 
-        return true;
     }
 
+    /**
+     * Business layer implementation for getting shop details
+     * @param latitude
+     * @param longitude
+     */
+    @Override
+    public void getShopDetails(String latitude, String longitude) {
+
+        // sanity check validation
+        validatelatlng(latitude.trim(), longitude.trim());
+
+        // latlng field value to be passed to GEOCODE API
+        String latLng = new StringBuffer().append(latitude).append(Constants.COMMA_SEPARATOR).append(longitude).toString();
+
+        // Google API handling for getting shop details based on customer's lat and lng
+        Result result = geoCodeService.getGeoCodeResponse(Constants.LAT_LNG_QUERY_PARAM,latLng);
+
+        // If status is other than OK then return false so as to indicate NO records/content found
+        validateResult(result);
+    }
+
+    /**
+     * Saves shop details to in memory list
+     * @param results
+     * @param shopWrapper
+     */
     private void saveShopDetails(Results results, ShopWrapper shopWrapper) {
         Shop shop = new Shop();
         shop.setLatitude(results.getGeometry().getLocation().getLat());
@@ -64,32 +97,68 @@ public class ShopServiceImpl implements ShopService{
         shopAddress.setNumber(shopWrapper.getShopAddress().getNumber());
         shopAddress.setPostCode(shopWrapper.getShopAddress().getPostCode());
         shop.setShopAddress(shopAddress);
-        if(!SHOPS.contains(shop))
         SHOPS.add(shop);
         System.out.println(SHOPS.size());
     }
 
-    private Result getGeoCodeResponse(ShopWrapper shopWrapper) {
-        Result result = null;
-        Invocation.Builder requestBuilder = buildAndInvokeGeoCodeAPI(shopWrapper);
-        Response response = requestBuilder.get();
-
-        if(response.getStatus() == 200) {
-            // convert response to POJO using GSON
-             Gson gson = new Gson();
-             result = gson.fromJson(response.readEntity(String.class).toString(), new TypeToken<Result>() {
-            }.getType());
-
-        }
-        return result;
+    /**
+     * Returns address value in specific format
+     * @param shopWrapper
+     * @return
+     */
+    public String getAddressValue(ShopWrapper shopWrapper) {
+        StringBuffer address = new StringBuffer();
+        return  address.append(shopWrapper.getShopAddress().getNumber().trim())
+                       .append(shopWrapper.getShopName().trim())
+                       .append(shopWrapper.getShopAddress().getPostCode()).toString();
     }
 
-    private Invocation.Builder buildAndInvokeGeoCodeAPI(ShopWrapper shopWrapper) {
-        Invocation.Builder request = ClientBuilder.newClient()
-                .target(Constants.GEOCODE_LAT_LNG_API).
-                        queryParam(Constants.ADDRESS_QUERY_PARAM,shopWrapper.getShopName() + shopWrapper.getShopAddress().getPostCode()).
-                        queryParam(Constants.KEY_QUERY_PARAM,Constants.GEOCODE_API_KEY)
-                .request(Constants.HEADER_VALUE);
-        return request;
+    /**
+     * Validate with GEOCODE status
+     * @param result
+     */
+    private void validateResult(Result result) {
+        if (!result.getStatus().equals(Constants.GEO_CODE_API_STATUS)) {
+            throw  new NoRecordsFoundException();
+        }
+    }
+
+    /**
+     * Performs sanity checking for incoming request parameters
+     * @param shopWrapper
+     */
+    private void  validateShopRequest(ShopWrapper shopWrapper){
+
+        if(StringUtils.isEmpty(shopWrapper.getShopName())){
+            throw new InvalidFieldException("shopName");
+        }
+
+        ShopAddressWrapper shopAddress = shopWrapper.getShopAddress();
+        if(Objects.isNull(shopAddress)){
+            throw new InvalidFieldException("shopAddress");
+        }
+
+        if(StringUtils.isEmpty(shopAddress.getNumber())){
+            throw new InvalidFieldException("number");
+        }
+
+        if(shopAddress.getPostCode() == null || shopAddress.getPostCode() <= 0){
+            throw new InvalidFieldException("postCode");
+        }
+
+    }
+
+    /**
+     * Performs sanity checking for incoming request parameters
+     * @param latitude
+     * @param longitude
+     */
+    private void validatelatlng(String latitude, String longitude) {
+        if(StringUtils.isEmpty(latitude)){
+            throw new InvalidFieldException("latitude");
+        }
+        if(StringUtils.isEmpty(longitude)){
+            throw new InvalidFieldException("longitude");
+        }
     }
 }

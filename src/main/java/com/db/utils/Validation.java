@@ -15,9 +15,9 @@ import java.util.Objects;
 @Component
 public class Validation {
 
-    public void  validateShopRequest(ShopWrapper shopWrapper){
+    /*public void  validateShopRequest(ShopWrapper shopWrapper){
 
-        if(StringUtils.isEmpty(shopWrapper.getShopName())){
+        if(StringUtils.isEmpty(shopWrapper.getShopName().trim())){
             throw new InvalidFieldException("shopName");
         }
 
@@ -35,4 +35,14 @@ public class Validation {
         }
 
     }
+
+
+    public void validatelatlng(String latitude, String longitude) {
+        if(StringUtils.isEmpty(latitude)){
+            throw new InvalidFieldException("latitude");
+        }
+        if(StringUtils.isEmpty(longitude)){
+            throw new InvalidFieldException("longitude");
+        }
+    }*/
 }
