@@ -1,23 +1,28 @@
 package com.db.impl;
 
+import com.db.entity.Shop;
+import com.db.entity.ShopAddress;
 import com.db.exception.InvalidFieldException;
-import com.db.exception.InvalidFieldExceptionHandler;
 import com.db.service.ShopService;
 import com.db.utils.Constants;
 import com.db.utils.Result;
 import com.db.utils.Results;
+import com.db.utils.Validation;
 import com.db.wrappers.ShopWrapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Objects;
+
+import static com.db.app.Application.SHOPS;
 
 /**
  * Created by mmaykarkar on 12/02/17.
@@ -26,39 +31,61 @@ import java.net.URL;
 @Service
 public class ShopServiceImpl implements ShopService{
 
+    @Autowired
+    private Validation validationUtil;
+
     @Override
     public void addShop(ShopWrapper shopWrapper) throws IOException {
 
-        // TO DO : Exception handling for input request
+        // sanity checking validation
+        validationUtil.validateShopRequest(shopWrapper);
 
-        String geoCodeURL = Constants.GEOCODE_LAT_LNG_API.concat(shopWrapper.getShopName() + shopWrapper.getShopAddress().getPostCode())+"&key="+Constants.GEOCODE_API_KEY;
+        // Google API handling for getting longitude and latitude
+        Result result = getGeoCodeResponse(shopWrapper);
 
-        System.out.println("FINAL URL : "+ geoCodeURL);
-
-        URL url = new URL(geoCodeURL);
-        HttpURLConnection connection =
-                (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(Constants.METHOD_TYPE);
-        connection.setRequestProperty(Constants.HEADER_KEY, Constants.HEADER_VALUE);
-
-        int responseCode = connection.getResponseCode();
-
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            Gson gson = new Gson();
-            Result result = gson.fromJson(response.toString(), new TypeToken<Result>(){}.getType());
-
-            System.out.println("SIZE : "+ result.getResults().length);
-
-
+        // processing response from Google GEOCODE API
+        for (Results results : result.getResults()) {
+            saveShopDetails(results, shopWrapper);
+            break;
+        }
 
     }
-}}
+
+    private Shop saveShopDetails(Results results, ShopWrapper shopWrapper) {
+        Shop shop = new Shop();
+        shop.setLatitude(results.getGeometry().getLocation().getLat());
+        shop.setLongitude(results.getGeometry().getLocation().getLng());
+        shop.setName(shopWrapper.getShopName());
+        ShopAddress shopAddress = new ShopAddress();
+        shopAddress.setNumber(shopWrapper.getShopAddress().getNumber());
+        shopAddress.setPostCode(shopWrapper.getShopAddress().getPostCode());
+        shop.setShopAddress(shopAddress);
+        SHOPS.add(shop);
+        System.out.println(SHOPS.size());
+        return shop;
+    }
+
+    private Result getGeoCodeResponse(ShopWrapper shopWrapper) {
+        Result result = null;
+        Invocation.Builder requestBuilder = buildAndInvokeGeoCodeAPI(shopWrapper);
+        Response response = requestBuilder.get();
+
+        if(response.getStatus() == 200) {
+            // convert response to POJO using GSON
+             Gson gson = new Gson();
+             result = gson.fromJson(response.readEntity(String.class).toString(), new TypeToken<Result>() {
+            }.getType());
+
+        }
+        return result;
+    }
+
+    private Invocation.Builder buildAndInvokeGeoCodeAPI(ShopWrapper shopWrapper) {
+        Invocation.Builder request = ClientBuilder.newClient()
+                .target(Constants.GEOCODE_LAT_LNG_API).
+                        queryParam(Constants.ADDRESS_QUERY_PARAM,shopWrapper.getShopName() + shopWrapper.getShopAddress().getPostCode()).
+                        queryParam(Constants.KEY_QUERY_PARAM,Constants.GEOCODE_API_KEY)
+                .request(Constants.HEADER_VALUE);
+        return request;
+    }
+}

@@ -13,10 +13,10 @@ public class ShopWrapper {
     private String shopName;
 
     @JsonProperty(value = "shopLongitude")
-    private int latitude;
+    private String latitude;
 
     @JsonProperty(value = "shopLatitude")
-    private int langitude;
+    private String langitude;
 
     @JsonProperty(value = "shopAddress")
     private ShopAddressWrapper shopAddress;
@@ -29,19 +29,19 @@ public class ShopWrapper {
         this.shopName = shopName;
     }
 
-    public int getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(int latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 
-    public int getLangitude() {
+    public String getLangitude() {
         return langitude;
     }
 
-    public void setLangitude(int langitude) {
+    public void setLangitude(String langitude) {
         this.langitude = langitude;
     }
 

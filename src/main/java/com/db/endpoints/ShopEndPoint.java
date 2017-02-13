@@ -22,10 +22,11 @@ public class ShopEndPoint {
     private ShopService shopService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper) throws IOException {
+    public void addShop(@RequestBody ShopWrapper shopWrapper) throws IOException {
 
         shopService.addShop(shopWrapper);
-        return new ResponseEntity(HttpStatus.CREATED);
+       /* ShopWrapper showResponseWrapper = shopService.addShop(shopWrapper);
+        return new ResponseEntity<ShopWrapper>(showResponseWrapper, HttpStatus.CREATED);*/
     }
 
 }

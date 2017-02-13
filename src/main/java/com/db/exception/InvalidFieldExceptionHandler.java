@@ -16,17 +16,14 @@ import static org.springframework.http.ResponseEntity.*;
  * Created by mmaykarkar on 12/02/17.
  */
 @ControllerAdvice
-public class InvalidFieldExceptionHandler extends  RuntimeException {
+public class InvalidFieldExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidFieldException.class)
-    public Map<String, String> handleProjectNotFoundException(HttpServletRequest req, InvalidFieldException ex) {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("id", ex.getField());
-        map.put("reason", "Project can not be found");
-        map.put("url", req.getRequestURI());
-        BodyBuilder responseBudiler = status(HttpStatus.BAD_REQUEST);
-        ResponseEntity<Object> response = responseBudiler.body(map);
-        return map;
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleInvalidFieldException(HttpServletRequest req, InvalidFieldException ex) {
+        ErrorResponse error = new ErrorResponse();
+        error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+        error.setField(ex.getField());
+        error.setMessage("Please enter valid value");
+        return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
     }
 }

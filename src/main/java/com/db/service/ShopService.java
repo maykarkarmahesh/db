@@ -1,6 +1,6 @@
 package com.db.service;
 
-import com.db.wrappers.ShopAddressWrapper;
+import com.db.entity.Shop;
 import com.db.wrappers.ShopWrapper;
 
 import java.io.IOException;
