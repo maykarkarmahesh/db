@@ -7,9 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.PathParam;
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -37,7 +34,7 @@ public class ShopEndPoint {
     }
 
     /**
-     * Service to return shop details based on Customer's lnglat
+     * Service to return shop details based on Customer's latitude and longitude
      * @param latitude
      * @param longitude
      * @return
@@ -47,6 +44,5 @@ public class ShopEndPoint {
         List<ShopWrapper> shopDetails = shopService.getShopDetails(latitude, longitude);
         return new ResponseEntity<List<ShopWrapper>>(shopDetails, HttpStatus.OK);
     }
-
 
 }

@@ -1,9 +1,9 @@
 package com.db.utils;
 
 /**
- * Created by mmaykarkar on 12/02/17.
+ * Created by mmaykarkar on 15/02/17.
  */
-public class Address_components {
+public class AddressComponents {
     private String long_name;
 
     private String[] types;

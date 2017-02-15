@@ -21,5 +21,9 @@ public class Constants {
 
     public static final String DOUBLE_PATTERN = "[0-9]+(\\.){0,1}[0-9]*";
 
+    public  static final String VALID_VALUE_ERROR_MESSAGE = "PLease enter valid value.";
+
+    public  static final String NO_RECORD_ERROR_MESSAGE = "No records found.";
+
 
 }

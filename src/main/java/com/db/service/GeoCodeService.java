@@ -1,6 +1,6 @@
 package com.db.service;
 
-import com.db.utils.Constants;
+import com.db.entity.Shop;
 import com.db.utils.Result;
 
 /**
@@ -9,4 +9,6 @@ import com.db.utils.Result;
 public interface GeoCodeService {
 
     public Result getGeoCodeResponse(String queryParam, String queryParamValue);
+
+    public double distanceTo(Shop shop, double customerLatitude, double customerLongitude);
 }

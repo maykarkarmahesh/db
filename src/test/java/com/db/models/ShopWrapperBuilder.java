@@ -11,7 +11,7 @@ public class ShopWrapperBuilder {
     public  static ShopWrapper getShopWrapperBuilder(){
         ShopWrapper shopWrapper = new ShopWrapper();
         shopWrapper.setShopName("test");
-        shopWrapper.setLangitude(34.23222);
+        shopWrapper.setLongitude(34.23222);
         shopWrapper.setLatitude(54.32232);
         ShopAddressWrapper shopAddressBuilder = ShopAddressWrapperBuilder.getShopAddressBuilder();
         shopWrapper.setShopAddress(shopAddressBuilder);

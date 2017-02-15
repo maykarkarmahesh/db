@@ -1,5 +1,6 @@
 package com.db.impl;
 
+import com.db.entity.Shop;
 import com.db.service.GeoCodeService;
 import com.db.utils.Constants;
 import com.db.utils.Result;
@@ -45,6 +46,25 @@ public class GeoCodeServiceImpl implements GeoCodeService {
 
         }
         return result;
+    }
+
+    @Override
+    public double distanceTo(Shop shop, double customerLatitude, double customerLongitude) {
+        double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+        double lat1 = Math.toRadians(shop.getLatitude());
+        double lon1 = Math.toRadians(shop.getLongitude());
+
+        double lat2 = Math.toRadians(customerLatitude);
+        double lon2 = Math.toRadians(customerLongitude);
+
+        // great circle distance in radians, using law of cosines formula
+        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)
+                + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
+
+        // each degree on a great circle of Earth is 60 nautical miles
+        double nauticalMiles = 60 * Math.toDegrees(angle);
+        double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
+        return statuteMiles;
     }
 
     /**

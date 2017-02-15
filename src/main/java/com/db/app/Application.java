@@ -6,9 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by mmaykarkar on 12/02/17.
@@ -17,7 +15,7 @@ import java.util.Set;
 @ImportResource(value = "application-context.xml")
 public class Application {
 
-    // used to save shop details globally at given instanace of module
+    // used to save shop details globally at given instance of module
     public static final List<Shop> SHOPS = new ArrayList<Shop>();
 
     public static void main(String[] args) {

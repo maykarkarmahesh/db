@@ -1,10 +1,8 @@
 package com.db.wrappers;
 
-import com.db.entity.Shop;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
 /**
  * Created by mmaykarkar on 12/02/17.
@@ -20,7 +18,7 @@ public class ShopWrapper {
     private Double latitude;
 
     @JsonProperty(value = "shopLatitude")
-    private Double langitude;
+    private Double longitude;
 
     @JsonProperty(value = "shopAddress")
     private ShopAddressWrapper shopAddress;
@@ -41,12 +39,12 @@ public class ShopWrapper {
         this.latitude = latitude;
     }
 
-    public Double getLangitude() {
-        return langitude;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public void setLangitude(Double langitude) {
-        this.langitude = langitude;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public ShopAddressWrapper getShopAddress() {

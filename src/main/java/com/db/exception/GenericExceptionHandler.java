@@ -1,16 +1,12 @@
 package com.db.exception;
 
+import com.db.utils.Constants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.springframework.http.ResponseEntity.*;
 
 /**
  * Created by mmaykarkar on 12/02/17.
@@ -23,15 +19,15 @@ public class GenericExceptionHandler {
         ErrorResponse error = new ErrorResponse();
         error.setErrorCode(HttpStatus.BAD_REQUEST.value());
         error.setField(ex.getField());
-        error.setMessage("Please enter valid value.");
+        error.setMessage(Constants.VALID_VALUE_ERROR_MESSAGE);
         return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
     }
 
     @ExceptionHandler(NoRecordsFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoRecordFoundException(HttpServletRequest req, NoRecordsFoundException ex) {
         ErrorResponse error = new ErrorResponse();
-        error.setErrorCode(HttpStatus.NOT_FOUND.value());
-        error.setMessage("No records found.");
+        error.setErrorCode(HttpStatus.NO_CONTENT.value());
+        error.setMessage(Constants.NO_RECORD_ERROR_MESSAGE);
         return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
     }
 }

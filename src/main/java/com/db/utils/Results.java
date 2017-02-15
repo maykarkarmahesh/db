@@ -9,7 +9,7 @@ public class Results {
 
     private String place_id;
 
-    private Address_components[] address_components;
+    private AddressComponents[] addressComponents;
 
     private String formatted_address;
 
@@ -37,14 +37,12 @@ public class Results {
         this.place_id = place_id;
     }
 
-    public Address_components[] getAddress_components ()
-    {
-        return address_components;
+    public AddressComponents[] getAddressComponents() {
+        return addressComponents;
     }
 
-    public void setAddress_components (Address_components[] address_components)
-    {
-        this.address_components = address_components;
+    public void setAddressComponents(AddressComponents[] addressComponents) {
+        this.addressComponents = addressComponents;
     }
 
     public String getFormatted_address ()
@@ -80,6 +78,6 @@ public class Results {
     @Override
     public String toString()
     {
-        return "ClassPojo [partial_match = "+partial_match+", place_id = "+place_id+", address_components = "+address_components+", formatted_address = "+formatted_address+", types = "+types+", geometry = "+geometry+"]";
+        return "ClassPojo [partial_match = "+partial_match+", place_id = "+place_id+", address_components = "+addressComponents+", formatted_address = "+formatted_address+", types = "+types+", geometry = "+geometry+"]";
     }
 }
