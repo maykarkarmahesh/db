@@ -13,9 +13,13 @@ import com.db.wrappers.ShopAddressWrapper;
 import com.db.wrappers.ShopWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static com.db.app.Application.SHOPS;
 
@@ -28,6 +32,9 @@ public class ShopServiceImpl implements ShopService{
 
     @Autowired
     private GeoCodeService geoCodeService;
+
+    @Value("${min.distance}")
+    private double minDistance;
 
     /**
      * Mockito constructor
@@ -68,19 +75,20 @@ public class ShopServiceImpl implements ShopService{
      * @param longitude
      */
     @Override
-    public void getShopDetails(String latitude, String longitude) {
+    public List<ShopWrapper> getShopDetails(double latitude, double longitude) {
 
-        // sanity check validation
-        validatelatlng(latitude.trim(), longitude.trim());
+        List<ShopWrapper> shopWrapperList = new ArrayList<ShopWrapper>();
+        for (Shop shop : SHOPS) {
+            double distance = distanceTo(shop, latitude, longitude);
+            if (distance <= minDistance)
+            {
+                ShopWrapper shopWrapper = wrapEntity(shop);
+                shopWrapperList.add(shopWrapper);
+            }
+        }
 
-        // latlng field value to be passed to GEOCODE API
-        String latLng = new StringBuilder().append(latitude).append(Constants.COMMA_SEPARATOR).append(longitude).toString();
+        return shopWrapperList;
 
-        // Google API handling for getting shop details based on customer's lat and lng
-        Result result = geoCodeService.getGeoCodeResponse(Constants.LAT_LNG_QUERY_PARAM,latLng);
-
-        // If status is other than OK then return false so as to indicate NO records/content found
-        validateResult(result);
     }
 
     /**
@@ -90,15 +98,18 @@ public class ShopServiceImpl implements ShopService{
      */
     private void saveShopDetails(Results results, ShopWrapper shopWrapper) {
         Shop shop = new Shop();
-        shop.setLatitude(results.getGeometry().getLocation().getLat());
-        shop.setLongitude(results.getGeometry().getLocation().getLng());
+        shop.setLatitude(Double.parseDouble(results.getGeometry().getLocation().getLat()));
+        shop.setLongitude(Double.parseDouble(results.getGeometry().getLocation().getLng()));
         shop.setName(shopWrapper.getShopName());
         ShopAddress shopAddress = new ShopAddress();
         shopAddress.setNumber(shopWrapper.getShopAddress().getNumber());
         shopAddress.setPostCode(shopWrapper.getShopAddress().getPostCode());
         shop.setShopAddress(shopAddress);
-        SHOPS.add(shop);
-        System.out.println(SHOPS.size());
+
+        if(!SHOPS.contains(shop)){
+            SHOPS.add(shop);
+        }
+
     }
 
     /**
@@ -148,17 +159,40 @@ public class ShopServiceImpl implements ShopService{
 
     }
 
-    /**
-     * Performs sanity checking for incoming request parameters
-     * @param latitude
-     * @param longitude
-     */
-    private void validatelatlng(String latitude, String longitude) {
-        if(StringUtils.isEmpty(latitude)){
-            throw new InvalidFieldException("latitude");
-        }
-        if(StringUtils.isEmpty(longitude)){
-            throw new InvalidFieldException("longitude");
-        }
+    // Compute the distance in meters
+    public double distanceTo(Shop shop, double customerLatitude, double customerLongitude)
+    {
+
+        double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+        double lat1 = Math.toRadians(shop.getLatitude());
+        double lon1 = Math.toRadians(shop.getLongitude());
+
+        double lat2 = Math.toRadians(customerLatitude);
+        double lon2 = Math.toRadians(customerLongitude);
+
+        // great circle distance in radians, using law of cosines formula
+        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)
+                + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
+
+        // each degree on a great circle of Earth is 60 nautical miles
+        double nauticalMiles = 60 * Math.toDegrees(angle);
+        double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
+        return statuteMiles;
+
     }
+
+
+
+    public ShopWrapper wrapEntity(Shop shop){
+        ShopWrapper shopWrapper = new ShopWrapper();
+        shopWrapper.setShopName(shop.getName());
+        shopWrapper.setLatitude(shop.getLatitude());
+        shopWrapper.setLangitude(shop.getLongitude());
+        ShopAddressWrapper shopAddressWrapper = new ShopAddressWrapper();
+        shopAddressWrapper.setNumber(shop.getShopAddress().getNumber());
+        shopAddressWrapper.setPostCode(shop.getShopAddress().getPostCode());
+        shopWrapper.setShopAddress(shopAddressWrapper);
+        return shopWrapper;
+    }
+
 }

@@ -7,7 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.PathParam;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
 
 
 /**
@@ -39,10 +42,11 @@ public class ShopEndPoint {
      * @param longitude
      * @return
      */
-    @RequestMapping(value = "/lat/{latitude}/lng/{longitude}", method = RequestMethod.GET)
-    public ResponseEntity getShopDetails(@PathVariable String latitude, @PathVariable String longitude) {
-        shopService.getShopDetails(latitude, longitude);
-        return null;
+    @RequestMapping(value = "/lat/{latitude}/lng/{longitude:.+}", method = RequestMethod.GET)
+    public ResponseEntity getShopDetails(@PathVariable double latitude, @PathVariable double longitude) {
+        List<ShopWrapper> shopDetails = shopService.getShopDetails(latitude, longitude);
+        return new ResponseEntity<List<ShopWrapper>>(shopDetails, HttpStatus.OK);
     }
+
 
 }

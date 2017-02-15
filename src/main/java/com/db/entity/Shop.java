@@ -6,8 +6,8 @@ package com.db.entity;
 public class Shop {
 
     private String name;
-    private String longitude;
-    private String latitude;
+    private Double longitude;
+    private Double latitude;
     private  ShopAddress shopAddress;
 
     public String getName() {
@@ -18,19 +18,19 @@ public class Shop {
         this.name = name;
     }
 
-    public String getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public String getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 

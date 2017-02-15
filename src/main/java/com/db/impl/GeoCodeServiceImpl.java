@@ -5,6 +5,7 @@ import com.db.utils.Constants;
 import com.db.utils.Result;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,12 @@ import javax.ws.rs.core.Response;
 @Service
 public class GeoCodeServiceImpl implements GeoCodeService {
 
+
+    @Value("${geo.code.lat.lng.api.url}")
+    private String geoCodeBaseURL;
+
+    @Value("${geo.code.api.key}")
+    private String geoCodeApiKey;
     /**
      * Calls and validate GEOCODE API response
      * @param queryParam
@@ -48,9 +55,9 @@ public class GeoCodeServiceImpl implements GeoCodeService {
      */
     private Invocation.Builder buildAndInvokeGeoCodeAPI(String queryParam, String queryParamValue) {
         Invocation.Builder request = ClientBuilder.newClient()
-                .target(Constants.GEOCODE_LAT_LNG_API).
+                .target(geoCodeBaseURL).
                         queryParam(queryParam,queryParamValue).
-                        queryParam(Constants.KEY_QUERY_PARAM,Constants.GEOCODE_API_KEY)
+                        queryParam(Constants.KEY_QUERY_PARAM,geoCodeApiKey)
                 .request(Constants.HEADER_VALUE);
         return request;
 
