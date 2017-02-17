@@ -28,7 +28,7 @@ import static com.db.app.Application.SHOPS;
  */
 
 @Service
-public class ShopServiceImpl implements ShopService{
+public class ShopServiceImpl implements ShopService {
 
     @Autowired
     private GeoCodeService geoCodeService;
@@ -53,6 +53,7 @@ public class ShopServiceImpl implements ShopService{
 
     /**
      * Business layer implementation for adding shop
+     *
      * @param shopWrapper
      */
     @Override
@@ -65,7 +66,7 @@ public class ShopServiceImpl implements ShopService{
         String addressValue = getAddressValue(shopWrapper);
 
         // Google API handling for getting longitude and latitude
-        Result result = geoCodeService.getGeoCodeResponse(Constants.ADDRESS_QUERY_PARAM,addressValue);
+        Result result = geoCodeService.getGeoCodeResponse(Constants.ADDRESS_QUERY_PARAM, addressValue);
 
         // If status is other than OK then return false so as to indicate NO records/content found
         validateResult(result);
@@ -80,6 +81,7 @@ public class ShopServiceImpl implements ShopService{
 
     /**
      * Business layer implementation for getting nearest shop details
+     *
      * @param latitude
      * @param longitude
      */
@@ -93,15 +95,14 @@ public class ShopServiceImpl implements ShopService{
             double distance = geoCodeService.distanceTo(shop, latitude, longitude);
 
             // compare with minDistance which is configurable as per requirement
-            if (distance <= minDistance)
-            {
+            if (distance <= minDistance) {
                 ShopWrapper shopWrapper = wrapEntity(shop);
                 shopWrapperList.add(shopWrapper);
             }
         }
 
-        if(CollectionUtils.isEmpty(shopWrapperList)){
-            throw  new NoRecordsFoundException();
+        if (CollectionUtils.isEmpty(shopWrapperList)) {
+            throw new NoRecordsFoundException();
         }
 
         return shopWrapperList;
@@ -110,6 +111,7 @@ public class ShopServiceImpl implements ShopService{
 
     /**
      * Saves shop details in memory list
+     *
      * @param results
      * @param shopWrapper
      */
@@ -124,7 +126,7 @@ public class ShopServiceImpl implements ShopService{
         shop.setShopAddress(shopAddress);
 
         // prevent from adding duplicate records
-        if(!SHOPS.contains(shop)){
+        if (!SHOPS.contains(shop)) {
             SHOPS.add(shop);
         }
 
@@ -132,47 +134,45 @@ public class ShopServiceImpl implements ShopService{
 
     /**
      * Returns address value in specific format
+     *
      * @param shopWrapper
      * @return
      */
     public String getAddressValue(ShopWrapper shopWrapper) {
         StringBuilder address = new StringBuilder();
-        return  address.append(shopWrapper.getShopAddress().getNumber().trim())
-                       .append(shopWrapper.getShopName().trim())
-                       .append(shopWrapper.getShopAddress().getPostCode()).toString();
+        return address.append(shopWrapper.getShopAddress().getNumber().trim())
+                .append(shopWrapper.getShopName().trim())
+                .append(shopWrapper.getShopAddress().getPostCode()).toString();
     }
 
     /**
      * Validate with GEOCODE status
+     *
      * @param result
      */
     private void validateResult(Result result) {
         if (!result.getStatus().equals(Constants.GEO_CODE_API_STATUS)) {
-            throw  new NoRecordsFoundException();
+            throw new NoRecordsFoundException();
         }
     }
 
     /**
      * Performs sanity checking for incoming request parameters
+     *
      * @param shopWrapper
      */
-    private void  validateShopRequest(ShopWrapper shopWrapper){
+    private void validateShopRequest(ShopWrapper shopWrapper) {
 
-        if(StringUtils.isEmpty(shopWrapper.getShopName())){
-            throw new InvalidFieldException(SHOP_NAME);
-        }
+        validateField(shopWrapper.getShopName(), SHOP_NAME);
 
         ShopAddressWrapper shopAddress = shopWrapper.getShopAddress();
-        if(Objects.isNull(shopAddress)){
+        if (Objects.isNull(shopAddress)) {
             throw new InvalidFieldException(SHOP_ADDRESS);
         }
 
-        if(StringUtils.isEmpty(shopAddress.getNumber().trim())){
-            throw new InvalidFieldException(SHOP_NUMBER);
-        }
+        validateField(shopAddress.getNumber(), SHOP_NUMBER);
 
-
-        if((Objects.isNull(shopAddress.getPostCode()))){
+        if ((Objects.isNull(shopAddress.getPostCode()))) {
             throw new InvalidFieldException(SHOP_POSTCODE);
         }
 
@@ -183,12 +183,25 @@ public class ShopServiceImpl implements ShopService{
 
     }
 
+    private void validateField(String fieldValue, String fieldName) {
+        if (StringUtils.isEmpty(fieldValue)) {
+            throw new InvalidFieldException(fieldName);
+        }
+
+        fieldValue = fieldValue.trim();
+
+        if (fieldValue.length() == 0) {
+            throw new InvalidFieldException(fieldName);
+        }
+    }
+
     /**
      * Converts Shop entity to its respective wrapper
+     *
      * @param shop
      * @return
      */
-    public ShopWrapper wrapEntity(Shop shop){
+    public ShopWrapper wrapEntity(Shop shop) {
         ShopWrapper shopWrapper = new ShopWrapper();
         shopWrapper.setShopName(shop.getName());
         shopWrapper.setLatitude(shop.getLatitude());
@@ -201,3 +214,4 @@ public class ShopServiceImpl implements ShopService{
     }
 
 }
+

@@ -16,7 +16,7 @@ public class ShopAddressWrapperBuilder {
 
     public static ShopAddressWrapper getShopAddressBuilderWithNullNumber(){
         ShopAddressWrapper shopAddressWrapper = new ShopAddressWrapper();
-        shopAddressWrapper.setNumber(null);
+        shopAddressWrapper.setNumber(" ");
         shopAddressWrapper.setPostCode(411014);
         return  shopAddressWrapper;
     }
