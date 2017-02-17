@@ -92,7 +92,7 @@ public class ShopServiceImpl implements ShopService{
             // calculate nearest distance
             double distance = geoCodeService.distanceTo(shop, latitude, longitude);
 
-            // compare with minDistance which can be configurable as per requirement
+            // compare with minDistance which is configurable as per requirement
             if (distance <= minDistance)
             {
                 ShopWrapper shopWrapper = wrapEntity(shop);
@@ -167,11 +167,17 @@ public class ShopServiceImpl implements ShopService{
             throw new InvalidFieldException(SHOP_ADDRESS);
         }
 
-        if(StringUtils.isEmpty(shopAddress.getNumber())){
+        if(StringUtils.isEmpty(shopAddress.getNumber().trim())){
             throw new InvalidFieldException(SHOP_NUMBER);
         }
 
-        if(shopAddress.getPostCode() == null || shopAddress.getPostCode() <= 0){
+
+        if((Objects.isNull(shopAddress.getPostCode()))){
+            throw new InvalidFieldException(SHOP_POSTCODE);
+        }
+
+        final int length = (int) Math.log10(shopAddress.getPostCode()) + 1;
+        if (length != Constants.POSTCODE_LENGTH) {
             throw new InvalidFieldException(SHOP_POSTCODE);
         }
 

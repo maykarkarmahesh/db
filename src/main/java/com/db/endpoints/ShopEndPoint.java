@@ -26,7 +26,7 @@ public class ShopEndPoint {
      * @param shopWrapper
      * @return 201 if created successfully OR respective error message
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/v1", method = RequestMethod.POST)
     public ResponseEntity addShop(@RequestBody ShopWrapper shopWrapper) {
         shopService.addShop(shopWrapper);
         return new ResponseEntity(HttpStatus.CREATED);
@@ -39,7 +39,7 @@ public class ShopEndPoint {
      * @param longitude
      * @return
      */
-    @RequestMapping(value = "/lat/{latitude}/lng/{longitude:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/lat/{latitude}/lng/{longitude:.+}", method = RequestMethod.GET)
     public ResponseEntity getShopDetails(@PathVariable double latitude, @PathVariable double longitude) {
         List<ShopWrapper> shopDetails = shopService.getShopDetails(latitude, longitude);
         return new ResponseEntity<List<ShopWrapper>>(shopDetails, HttpStatus.OK);

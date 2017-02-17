@@ -25,5 +25,7 @@ public class Constants {
 
     public  static final String NO_RECORD_ERROR_MESSAGE = "No records found.";
 
+    public  static final Integer POSTCODE_LENGTH = 6;
+
 
 }
